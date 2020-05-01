@@ -2,7 +2,7 @@
 
 Az elkészített script a valuták közti átváltást valósítja meg, az árfolyamot [API segítségével](https://rapidapi.com/fyhao/api/currency-exchange) kéri le.
 
-##Használata:
+## Használata:
 ```bash
 ./os.sh MENNYIT MIBŐL MIBE
 ```
