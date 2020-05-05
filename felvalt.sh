@@ -1,22 +1,55 @@
 #!/bin/bash
 API_KEY="8649b5fcc1mshd7b3e2fbc4f0314p1b04b7jsnba05517620bb"
 API_HOST="currency-exchange.p.rapidapi.com"
+quantity=1
 
-if [ $# -eq 3 ]; then
-    API_URL="https://currency-exchange.p.rapidapi.com/exchange?q=1&from=$2&to=$3"
-    x1=$(curl -s --request GET --url $API_URL --header "x-rapidapi-host: $API_HOST" --header "x-rapidapi-key: $API_KEY")
-    x2=$(echo "$x1 * $1" | bc)
-    echo $1 $2 = $x2 $3
-elif [ $# -eq 1 ] && [ $1 = "-l" ] || [ $1 = "--list" ]; then
-    echo -n 'Támogatott valuták: '
-    API_URL="https://currency-exchange.p.rapidapi.com/listquotes"
-    x=$(curl -s --request GET --url $API_URL --header "x-rapidapi-host $API_HOST" --header "x-rapidapi-key: $API_KEY")
-    echo "${x//\"}"
-else
+function help() {
     echo "Valuta átváltás"
-    echo "Használat: $(basename $0) MENNYIT MIBŐL MIBE"
-    echo "Példa: $(basename $0) 100 USD EUR"
-    echo "A támogatott valuták a '$(basename $0) -l' vagy a '$(basename $0) --list' paranccsal írathatók ki."
-fi
+    echo "Használat: $(basename $0) -q MENNYIT -f MIBŐL -t MIBE"
+    echo "Példa: $(basename $0) -q 100 -f USD -t EUR"
+    echo "A támogatott valuták a '$(basename $0) -l' paranccsal írathatók ki."
+}
 
+function list() {
+    echo -n 'Támogatott valuták: '
+    local API_URL="https://currency-exchange.p.rapidapi.com/listquotes"
+    local x=$(curl -s --request GET --url $API_URL --header "x-rapidapi-host $API_HOST" --header "x-rapidapi-key: $API_KEY")
+    echo "${x//\"}"
+}
+
+function exchange() {
+    local API_URL="https://currency-exchange.p.rapidapi.com/exchange?q=1&from=$from&to=$to"
+    local rate=$(curl -s --request GET --url $API_URL --header "x-rapidapi-host: $API_HOST" --header "x-rapidapi-key: $API_KEY")
+    local result=$(echo "$rate * $quantity" | bc)
+    echo $quantity $from = $result $to
+}
+
+while getopts "hlf:t:q:" option; do
+    case "$option" in
+        l)
+           list
+           exit
+           ;;
+        h)
+           help
+           exit
+           ;;
+        t)
+           to=$OPTARG
+           ;;
+        f)
+           from=$OPTARG
+           ;;
+        q)
+           quantity=$OPTARG
+           ;;
+    esac
+done
+
+if [ -z "$to" ] || [ -z "$from" ]; then
+    echo Hibás paraméterezés!
+    help
+else
+    exchange
+fi
 
