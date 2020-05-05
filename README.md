@@ -4,7 +4,7 @@ Az elkészített script a valuták közti átváltást valósítja meg, az árfo
 
 ## Használata:
 ```bash
-./os.sh MENNYIT MIBŐL MIBE
+./felvalt.sh MENNYIT MIBŐL MIBE
 ```
 
 A támogatott valuták a ```-l``` vagy a ```--list``` kapcsolóval kilistázhatók.
